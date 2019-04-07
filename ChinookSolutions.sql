@@ -128,6 +128,110 @@ FROM PlaylistTrack
 LEFT JOIN Playlist as play on play.PlaylistId = PlaylistTrack.PlaylistId
 GROUP BY play.Name
 
+/*16.tracks_no_id.sql: Provide a query that shows all the Tracks, but displays no IDs. 
+The result should include the Album name, Media type and Genre.*/
+SELECT Track.Name AS 'Track',
+	   Album.Title AS 'Album',
+	   MediaType.Name AS 'Media Type',
+	   Genre.Name AS 'Genre'	
+FROM Track, Album, MediaType, Genre
+WHERE Album.AlbumId = Track.AlbumId
+AND MediaType.MediaTypeId = Track.MediaTypeId
+AND Genre.GenreId = Track.GenreId
+
+/*17.invoices_line_item_count.sql: Provide a query that shows all Invoices but includes the # of invoice line items.*/
+SELECT Invoice.InvoiceId AS 'Invoice Id',
+	   COUNT(InvoiceLine.InvoiceLineId) AS '# Line Items'
+FROM InvoiceLine, Invoice
+WHERE Invoice.InvoiceId = InvoiceLine.InvoiceId
+GROUP BY Invoice.InvoiceId
+
+/*18. sales_agent_total_sales.sql: Provide a query that shows total sales made by each sales agent.*/
+SELECT Employee.LastName AS 'Sales Agent Last Name', 
+	   SUM(Invoice.Total)
+FROM Employee, Customer, Invoice
+WHERE 
+Title like '%Sales%' AND Title like '%Agent%'
+AND Customer.SupportRepId = Employee.EmployeeId
+AND Invoice.CustomerId = Customer.CustomerId
+GROUP BY Employee.LastName
+
+/*19.top_2009_agent.sql: Which sales agent made the most in sales in 2009?*/
+SELECT TOP 1
+	   CONCAT(Employee.FirstName, ' ', Employee.LastName) AS 'Sales Agent', 
+	   SUM(Total) AS 'Total Sales in 2009'
+FROM Employee, Customer, Invoice
+WHERE 
+Title like '%Sales%' AND Title like '%Agent%'
+AND SUBSTRING(CONVERT(VARCHAR(10), InvoiceDate, 111), 0, 5) like '%2009%'
+AND Customer.SupportRepId = Employee.EmployeeId
+AND Invoice.CustomerId = Customer.CustomerId
+GROUP BY CONCAT(Employee.FirstName, ' ', Employee.LastName)
+ORDER BY SUM(Total) desc
+
+/*20.top_agent.sql: Which sales agent made the most in sales over all?*/
+SELECT TOP 1
+	   CONCAT(Employee.FirstName, ' ', Employee.LastName) AS 'Sales Agent', 
+	   SUM(Invoice.Total) AS 'Total Sales'
+FROM Employee, Customer, Invoice
+WHERE 
+Title like '%Sales%' AND Title like '%Agent%'
+AND Customer.SupportRepId = Employee.EmployeeId
+AND Invoice.CustomerId = Customer.CustomerId
+GROUP BY CONCAT(Employee.FirstName, ' ', Employee.LastName)
+ORDER BY SUM(Invoice.Total) desc
+
+/*21.sales_agent_customer_count.sql: Provide a query that shows the count of customers assigned to each sales agent.*/
+SELECT CONCAT(Employee.FirstName, ' ', Employee.LastName) AS 'Sales Agent',
+COUNT(Customer.CustomerId) AS 'Customer Count'
+FROM Employee
+JOIN Customer on Customer.SupportRepId = Employee.EmployeeId
+WHERE Employee.Title like '%Sales%' AND Title like '%Agent%'
+GROUP BY CONCAT(Employee.FirstName, ' ', Employee.LastName)
+
+/*22.sales_per_country.sql: Provide a query that shows the total sales per country.*/
+SELECT SUM(Total) AS 'Total Sales',
+	   BillingCountry AS 'Country'
+FROM Invoice 
+GROUP BY BillingCountry
+
+/*23.top_country.sql: Which country's customers spent the most?*/
+SELECT SUM(Total) AS 'Total Sales',
+	   BillingCountry AS 'Country'
+FROM Invoice 
+GROUP BY BillingCountry
+ORDER BY SUM(Total) desc
+
+/*24.top_2013_track.sql: Provide a query that shows the most purchased track of 2013.*/
+SELECT Track.Name AS 'Track Name',
+	   COUNT(InvoiceLine.TrackId) AS '# Purchased'
+FROM Track
+JOIN InvoiceLine on Track.TrackId = InvoiceLine.TrackId
+JOIN Invoice on Invoice.InvoiceId = InvoiceLine.InvoiceId
+WHERE SUBSTRING(CONVERT(VARCHAR(10), Invoice.InvoiceDate, 111), 0, 5) like '%2013%'
+GROUP BY Track.Name
+ORDER BY COUNT(InvoiceLine.TrackId) desc
+
+/*25.top_5_tracks.sql: Provide a query that shows the top 5 most purchased songs.*/
+SELECT TOP 5
+	   Track.Name AS 'Track Name',
+	   COUNT(InvoiceLine.TrackId) AS '# Purchased'
+FROM Track
+JOIN InvoiceLine on Track.TrackId = InvoiceLine.TrackId
+JOIN Invoice on Invoice.InvoiceId = InvoiceLine.InvoiceId
+GROUP BY Track.Name
+ORDER BY COUNT(InvoiceLine.TrackId) desc
+
+/*26.top_3_artists.sql: Provide a query that shows the top 3 best selling artists.*/
+
+/*27.top_media_type.sql: Provide a query that shows the most purchased Media Type.*/
+
+
+
+
+
+
+
 
 
 
